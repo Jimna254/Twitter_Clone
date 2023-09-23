@@ -1,7 +1,35 @@
 ﻿@page "/"
+@inject ICommentService commentService
+@inject IPostService postService
+
+
 
 <PageTitle>Index</PageTitle>
+<div>
+    @foreach (var post in posts)
+    {
+        <div>
+            <p>@post.title</p>
+            <p>@post.body</p>
+        </div>
+    }
+    @* @foreach(var comment in comments){
+    <div>
+    <p>@comment.email</p>
+    <p>@comment.body</p>
+    <p>@comment.name</p>
+    </div>
+    } *@
+</div>
 
-<h1>The Talk Box</h1>
 
+@code {
+    private List<CommentDTO> comments = new List<CommentDTO>();
+    private List<PostDTO> posts = new List<PostDTO>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        @* comments =await commentService.GetCommentsAsync(); *@
+        posts = await postService.GetPostsAsync();
+    }
+}
