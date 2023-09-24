@@ -1,35 +1,83 @@
 ﻿@page "/"
+@page "/user/{user}"
 @inject ICommentService commentService
 @inject IPostService postService
 
 
 
-<PageTitle>Index</PageTitle>
-<div>
-    @foreach (var post in posts)
-    {
-        <div>
-            <p>@post.title</p>
-            <p>@post.body</p>
-        </div>
-    }
-    @* @foreach(var comment in comments){
-    <div>
-    <p>@comment.email</p>
-    <p>@comment.body</p>
-    <p>@comment.name</p>
+<div class="row ">
+    <div class="col-8 posts">
+        @foreach (var post in posts)
+        {
+            <div class="post">
+                <div class="avater1">
+                    <div class="profile"></div>
+                </div>
+                <p>@post.userid</p>
+                <p>@post.title</p>
+                <p>@post.body</p>
+                <button @onclick="@(()=>GetComments(post.id))">comments</button>
+            </div>
+            @if (selectedPost == post.id)
+            {
+
+                <div class=" comments">
+                    @foreach (var comment in postComments)
+                    {
+                        <div class="comment">
+                            <div class="avater1">
+                                <div class="profile"></div>
+                                <p>@comment.email</p>
+                            </div>
+                            <div class="content">
+                                <p>@comment.name</p>
+                                <p>@comment.body</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
     </div>
-    } *@
+  
 </div>
 
 
 @code {
-    private List<CommentDTO> comments = new List<CommentDTO>();
-    private List<PostDTO> posts = new List<PostDTO>();
+    private IEnumerable<PostDTO> posts = new List<PostDTO>();
+    private List<CommentDTO> postComments = new List<CommentDTO>();
+
+    private int selectedPost = 0;
+    [Parameter]
+    public string user { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        @* comments =await commentService.GetCommentsAsync(); *@
         posts = await postService.GetPostsAsync();
+    }
+
+    private async Task GetComments(int id)
+    {
+        var comments = await commentService.GetCommentsAsync();
+        postComments = comments.Where(c => c.postId == id).ToList();
+        selectedPost = id;
+    }
+
+    protected override void OnParametersSet()
+    {
+        var filters = new List<Func<PostDTO, bool>>();
+        if (user is not null)
+        {
+            var userId = int.Parse(user);
+            filters.Add(x => x.userid == userId);
+        }
+        if (filters.Any())
+        {
+            posts = posts.Where(post => filters.All(filter => filter(post)));
+        }
+        else
+        {
+            posts = posts;
+        }
     }
 }

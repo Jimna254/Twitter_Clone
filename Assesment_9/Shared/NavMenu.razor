@@ -1,22 +1,31 @@
-﻿<nav class="navbar navbar-expand-lg navbar-light bg-primary" style="display:flex; flex-direction:row ">
-    <a class="navbar-brand" href="#">Talk Box</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">My Posts</a>
-            </li>
-            
-        </ul>
-        
-        <form class="form-inline my-2 my-lg-0" style="display:flex; flex-direction:row; ">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="justify-content:flex-end;">
-            
-        </form>
-    </div>
-</nav>
+﻿@inject IUserService userService
+@inject NavigationManager navigationManager
+
+<div>
+    <h1>Twitter</h1>
+    <select  @onchange="HandleSelection" >
+    <option value="">"Select a user"</option>
+    @foreach (var user in users)
+    {
+        <option value="@user.id">@user.name</option>
+    }
+</select>
+</div>
+
+@code{
+
+    private List<UserDTO> users = new List<UserDTO>();
+    
+    private string selectedOption = "";
+    private int userId =0;
+
+    private void HandleSelection(ChangeEventArgs e){
+        selectedOption = e.Value.ToString();
+        Console.WriteLine(selectedOption);
+        navigationManager.NavigateTo($"/user/{selectedOption}");
+    }
+
+    protected override async Task OnInitializedAsync(){
+        users = await userService.GetUsersAsync();
+    }
+}

@@ -8,7 +8,7 @@ namespace Assesment_9.Services.Comments
     public class CommentsService : ICommentService
     {
         private readonly HttpClient _httpClient;
-        private readonly string CommentsUrl = "https://jsonplaceholder.typicode.com/users ";
+        private readonly string CommentsUrl = "https://jsonplaceholder.typicode.com/comments ";
 
         public CommentsService(HttpClient httpClient)
         {
